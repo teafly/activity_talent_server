@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+pushd `dirname $0`/.. > /dev/null
+popd > /dev/null
+BASE=/home/admin/app/activity_talent_server
+OUTPUT=/home/admin/data/activity_talent
+
+thin start -a 115.29.167.182 -p 4567 -R $BASE/conf/config.ru -l $OUTPUT/log/server.log -P $OUTPUT/pid/server.pid -d

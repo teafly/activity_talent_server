@@ -4,7 +4,7 @@ require 'sinatra'
 require 'mongoid'
 require 'mongoid_fulltext'
 
-Mongoid.load!("mongoid.yml", :production)
+Mongoid.load!("../conf/mongoid.yml", :production)
 
 class Activity
 	include Mongoid::Document
