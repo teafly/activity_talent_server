@@ -4,6 +4,9 @@ require 'sinatra'
 require 'mongoid'
 require 'mongoid_fulltext'
 
+#set :bind, "nb.alibaba-inc.com"
+#set :port, "4567"
+
 Mongoid.load!("mongoid.yml", :production)
 
 class Activity
