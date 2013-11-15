@@ -3,12 +3,18 @@
 require 'sinatra'
 require 'mongoid'
 require 'mongoid_fulltext'
+require 'oj'
 
 Mongoid.load!("../conf/mongoid.yml", :production)
+
+module JsonParser
+
+end
 
 class Activity
 	include Mongoid::Document
 	include Mongoid::FullTextSearch
+	include JsonParser
 
 	store_in collection: "activity", database: "activity_talent", session: "default"
 
@@ -25,7 +31,8 @@ end
 get '/activity/all' do
 
 	at = Activity.only(:title).all()
-	"#{at.to_json}"
+	#"#{at.to_json}"
+	Oj::dump at
 end
 
 get '/activity/:id' do |id|
