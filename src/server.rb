@@ -3,18 +3,68 @@
 require 'sinatra'
 require 'mongoid'
 require 'mongoid_fulltext'
-require 'oj'
 
 Mongoid.load!("../conf/mongoid.yml", :production)
 
-module JsonParser
+module Serialize
+
+	class S11nFactory
+
+		def initialize(config = {})
+
+			@alias = config
+		end
+
+		def serialize(datas)
+
+			return if datas.nil?
+
+			if datas.is_a? Array
+
+				results = []
+				datas.each do |data|
+					res = _serialize data
+					results.push res.to_json
+				end
+				results
+			else
+				_serialize(datas).to_json
+			end
+		end
+
+
+		private
+		def _serialize(data)
+
+			res = {}
+			data = JSON.parse(data.to_json)[data.class.to_s.downcase]
+
+			data.each do |key, val|
+
+				if @alias.include? key.to_sym
+
+					res[@alias[key.to_sym]] = val
+				elsif ! val.nil?
+
+					res[key] = val
+				end
+			end
+			res
+		end
+	end
+
+	def self.create(config = {})
+
+		S11nFactory.new config
+	end
 
 end
+
+s11n = Serialize.create({:id => "id"})
 
 class Activity
 	include Mongoid::Document
 	include Mongoid::FullTextSearch
-	include JsonParser
 
 	store_in collection: "activity", database: "activity_talent", session: "default"
 
@@ -28,32 +78,28 @@ class Activity
 	fulltext_search_in :title, :address, :detail
 end
 
-get '/activity/all' do
+get '/activities' do
 
 	at = Activity.only(:title).all()
-	#"#{at.to_json}"
-	Oj::dump at
+	s11n.serialize at
 end
 
 get '/activity/:id' do |id|
 
 	at = Activity.find(id)
-	"#{at.to_json}"
+	s11n.serialize at
 end
 
 get '/activities/:keyword' do |keyword|
 
 	#Activity.update_ngram_index
 	at = Activity.fulltext_search(keyword)
-	"#{at.to_json}"
+	s11n.serialize at
 end
 
-get '/activity/test' do
+post '/add-activity' do
 
-	Activity.create([
-	  { createTime: Time.now, modifiedTime: Time.now, title: "apple to donow", address: "abc", time: "2013-11-11 12:00", detail: "Guangxi NanNing" },
-	  { createTime: Time.now, modifiedTime: Time.now, title: "xigua to pinaow", address: "bcd", time: "2013-11-11 12:00", detail: "Guangxi Nfdasfadsfadsfg" },
-	  { createTime: Time.now, modifiedTime: Time.now, title: "longqi to donow", address: "efd", time: "2013-11-11 12:00", detail: "Guangxi Shanghai" }
-	])
-	"hello"
+	request.body.rewind  # in case someone already read it
+	data = JSON.parse request.body.read
+	return data
 end
