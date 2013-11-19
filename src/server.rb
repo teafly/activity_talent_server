@@ -102,8 +102,8 @@ post '/add-activity' do
 	request.body.rewind  # in case someone already read it
 	data = JSON.parse request.body.read
 	ac = Activity.new(data)
-	ac.createTime = Time.new
-	ac.modifiedTime = Time.new
+	ac.createTime = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+	ac.modifiedTime = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 	ac.save!
 end
 
