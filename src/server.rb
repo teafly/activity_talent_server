@@ -60,7 +60,7 @@ module Serialize
 
 end
 
-s11n = Serialize.create({:id => "id"})
+s11n = Serialize.create({:_id => "id"})
 
 class Activity
 	include Mongoid::Document
