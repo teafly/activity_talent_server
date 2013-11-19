@@ -101,5 +101,15 @@ post '/add-activity' do
 
 	request.body.rewind  # in case someone already read it
 	data = JSON.parse request.body.read
-	return data
+	ac = Activity.new(data)
+	ac.createTime = Time.new
+	ac.modifiedTime = Time.new
+	ac.save!
+end
+
+get '/test' do
+
+	ac = Activity.new
+	ac.address = 'hello'
+	ac.save
 end
