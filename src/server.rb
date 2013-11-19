@@ -19,17 +19,17 @@ module Serialize
 
 			return if datas.nil?
 
+			results = []
 			if datas.is_a? Array
 
-				results = []
 				datas.each do |data|
 					res = _serialize data
 					results.push res.to_json
 				end
-				results
 			else
-				_serialize(datas).to_json
+				results.push _serialize(datas).to_json
 			end
+			results
 		end
 
 
