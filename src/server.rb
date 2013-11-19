@@ -92,7 +92,7 @@ end
 
 get '/activities/:keyword' do |keyword|
 
-	#Activity.update_ngram_index
+	Activity.update_ngram_index
 	at = Activity.fulltext_search(keyword)
 	s11n.serialize at
 end
