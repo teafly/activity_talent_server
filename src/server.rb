@@ -24,7 +24,7 @@ module Serialize
 				results = []
 				datas.each do |data|
 					res = _serialize data
-					results.push res.to_json
+					results.push res
 				end
 				results.to_json
 			else
