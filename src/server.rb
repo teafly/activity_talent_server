@@ -68,8 +68,8 @@ class Activity
 
 	store_in collection: "activity", database: "activity_talent", session: "default"
 
-	field :createTime,		type: Date
-	field :modifiedTime,	type: Date
+	field :createTime,		type: String
+	field :modifiedTime,	type: String
 	field :title,					type: String
 	field :address,				type: String
 	field :time,					type: String
