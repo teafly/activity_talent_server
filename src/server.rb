@@ -26,7 +26,7 @@ module Serialize
 					res = _serialize data
 					results.push res.to_json
 				end
-				Json.parse(results)
+				JSON.parse(results)
 			else
 				_serialize(datas).to_json
 			end
