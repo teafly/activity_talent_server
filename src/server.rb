@@ -106,10 +106,3 @@ post '/add-activity' do
 	ac.modifiedTime = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 	ac.save!
 end
-
-get '/test' do
-
-	ac = Activity.new
-	ac.address = 'hello'
-	ac.save
-end
