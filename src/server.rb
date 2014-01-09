@@ -3,68 +3,14 @@
 require 'sinatra'
 require 'mongoid'
 require 'mongoid_fulltext'
+require 'json_bean/mongoid'
 
 Mongoid.load!("../conf/mongoid.yml", :production)
-
-module Serialize
-
-	class S11nFactory
-
-		def initialize(config = {})
-
-			@alias = config
-		end
-
-		def serialize(datas)
-
-			return if datas.nil?
-
-			if datas.is_a? Array
-
-				results = []
-				datas.each do |data|
-					res = _serialize data
-					results.push res
-				end
-				results.to_json
-			else
-				_serialize(datas).to_json
-			end
-		end
-
-
-		private
-		def _serialize(data)
-
-			res = {}
-			data = JSON.parse(data.to_json)[data.class.to_s.downcase]
-
-			data.each do |key, val|
-
-				if @alias.include? key.to_sym
-
-					res[@alias[key.to_sym]] = val
-				elsif ! val.nil?
-
-					res[key] = val
-				end
-			end
-			res
-		end
-	end
-
-	def self.create(config = {})
-
-		S11nFactory.new config
-	end
-
-end
-
-s11n = Serialize.create({:_id => "id"})
 
 class Activity
 	include Mongoid::Document
 	include Mongoid::FullTextSearch
+	include JsonBean::Mongoid
 
 	store_in collection: "activity", database: "activity_talent", session: "default"
 
@@ -76,25 +22,24 @@ class Activity
 	field :detail,				type: String
 
 	fulltext_search_in :title, :address, :detail
+	bean_alias _id: "id"
 end
 
 get '/activities' do
 
 	at = Activity.only(:title).all()
-	s11n.serialize at
+	at.to_json_bean
 end
 
 get '/activity/:id' do |id|
 
-	at = Activity.find(id)
-	s11n.serialize at
+	Activity.find(id).to_json_bean
 end
 
 get '/activities/:keyword' do |keyword|
 
 	Activity.update_ngram_index
-	at = Activity.fulltext_search(keyword)
-	s11n.serialize at
+	Activity.fulltext_search(keyword).to_json_bean
 end
 
 post '/add-activity' do
